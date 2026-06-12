@@ -14,9 +14,9 @@ typedef struct {
 int main(
     void
 ) {
-  domain_t domain = {};
-  flow_field_t flow_field = {};
-  flow_solver_t flow_solver = {};
+  domain_t domain = {0};
+  flow_field_t flow_field = {0};
+  flow_solver_t flow_solver = {0};
   if (0 != domain_init(&domain)) {
     return 1;
   }
