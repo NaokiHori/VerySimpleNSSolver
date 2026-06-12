@@ -20,21 +20,23 @@ int update_pressure(
   // exchange halo
   // NOTE: since DCT assumes dpdx = 0,
   //       boundary conditions are not directly imposed
-  if (X_PERIODIC) {
-    if (0 != exchange_halo_x(domain, p)) {
-      LOGGER_FAILURE("failed to exchange halo in x");
-      goto abort;
-    }
+#if defined(X_PERIODIC)
+  if (0 != exchange_halo_x(domain, p)) {
+    LOGGER_FAILURE("failed to exchange halo in x");
+    goto abort;
   }
-  if (Y_PERIODIC) {
-    if (0 != exchange_halo_y(domain, p)) {
-      LOGGER_FAILURE("failed to exchange halo in y");
-      goto abort;
-    }
+#endif
+#if defined(Y_PERIODIC)
+  if (0 != exchange_halo_y(domain, p)) {
+    LOGGER_FAILURE("failed to exchange halo in y");
+    goto abort;
   }
+#endif
   return 0;
+#if defined(X_PERIODIC) || defined(Y_PERIODIC)
 abort:
   LOGGER_FAILURE("failed to update pressure field");
   return 1;
+#endif
 }
 

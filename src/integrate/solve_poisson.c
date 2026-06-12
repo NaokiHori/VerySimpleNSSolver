@@ -41,19 +41,17 @@ int solve_poisson(
     }
   }
   // project x to wave space
-  if (X_PERIODIC) {
-    rdft_plan_t * const rdft_plan = poisson_solver->rdft_plan;
-    if (0 != rdft_exec_f(rdft_plan, buf0)) {
-      LOGGER_FAILURE("failed to perform RDFT");
-      goto abort;
-    }
-  } else {
-    dct_plan_t * const dct_plan = poisson_solver->dct_plan;
-    if (0 != dct_exec_f(dct_plan, buf0)) {
-      LOGGER_FAILURE("failed to perform DCT2");
-      goto abort;
-    }
+#if defined(X_PERIODIC)
+  if (0 != rdft_exec_f(poisson_solver->rdft_plan, buf0)) {
+    LOGGER_FAILURE("failed to perform RDFT");
+    goto abort;
   }
+#else
+  if (0 != dct_exec_f(poisson_solver->dct_plan, buf0)) {
+    LOGGER_FAILURE("failed to perform DCT2");
+    goto abort;
+  }
+#endif
   // x-align to y-align
   if (0 != transpose(nx, ny, buf0, buf1)) {
     LOGGER_FAILURE("failed to transpose array from x-aligned to y-aligned");
@@ -77,40 +75,35 @@ int solve_poisson(
     goto abort;
   }
   // project x to physical space
-  if (X_PERIODIC) {
-    rdft_plan_t * const rdft_plan = poisson_solver->rdft_plan;
-    if (0 != rdft_exec_b(rdft_plan, buf0)) {
-      LOGGER_FAILURE("failed to perform IRDFT");
-      goto abort;
-    }
-  } else {
-    dct_plan_t * const dct_plan = poisson_solver->dct_plan;
-    if (0 != dct_exec_b(dct_plan, buf0)) {
-      LOGGER_FAILURE("failed to perform DCT3");
-      goto abort;
-    }
+#if defined(X_PERIODIC)
+  if (0 != rdft_exec_b(poisson_solver->rdft_plan, buf0)) {
+    LOGGER_FAILURE("failed to perform IRDFT");
+    goto abort;
   }
+#else
+  if (0 != dct_exec_b(poisson_solver->dct_plan, buf0)) {
+    LOGGER_FAILURE("failed to perform DCT3");
+    goto abort;
+  }
+#endif
 #pragma omp parallel for
   for (size_t j = 1; j <= ny; j++) {
     for (size_t i = 1; i <= nx; i++) {
       psi[j][i] = buf0[(j - 1) * nx + (i - 1)];
     }
   }
-  // exchange halo
-  // NOTE: since DCT assumes dpdx = 0,
-  //       boundary conditions are not directly imposed
-  if (X_PERIODIC) {
-    if (0 != exchange_halo_x(domain, psi)) {
-      LOGGER_FAILURE("failed to exchange halo in x");
-      goto abort;
-    }
+#if defined(X_PERIODIC)
+  if (0 != exchange_halo_x(domain, psi)) {
+    LOGGER_FAILURE("failed to exchange halo in x");
+    goto abort;
   }
-  if (Y_PERIODIC) {
-    if (0 != exchange_halo_y(domain, psi)) {
-      LOGGER_FAILURE("failed to exchange halo in y");
-      goto abort;
-    }
+#endif
+#if defined(Y_PERIODIC)
+  if (0 != exchange_halo_y(domain, psi)) {
+    LOGGER_FAILURE("failed to exchange halo in y");
+    goto abort;
   }
+#endif
   return 0;
 abort:
   return 1;

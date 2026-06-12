@@ -1,7 +1,15 @@
 #include "domain.h"
 
-const size_t ux_imin = X_PERIODIC ? 1 : 2;
-const size_t uy_jmin = Y_PERIODIC ? 1 : 2;
+#if defined(X_PERIODIC)
+const size_t ux_imin = 1;
+#else
+const size_t ux_imin = 2;
+#endif
+#if defined(Y_PERIODIC)
+const size_t uy_jmin = 1;
+#else
+const size_t uy_jmin = 2;
+#endif
 
 int domain_init(
     domain_t * const domain

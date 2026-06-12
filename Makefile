@@ -1,5 +1,5 @@
 CC     := cc
-CFLAG  := -std=c99 -Wall -Wextra -Werror -O3 $(ARG_CFLAG)
+CFLAG  := -std=c99 -Wall -Wextra -Wpedantic -Werror -O3 $(ARG_CFLAG)
 INC    := -Iinclude
 LIB    := -lm
 SRCDIR := src

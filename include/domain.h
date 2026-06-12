@@ -2,10 +2,11 @@
 #define DOMAIN_H
 
 #include <stddef.h> // size_t
-#include <stdbool.h> // true, false
 
-#define X_PERIODIC true
-#define Y_PERIODIC false
+// x is periodic when defined; otherwise wall-bounded
+#define X_PERIODIC
+// y is periodic when defined; otherwise wall-bounded
+// #define Y_PERIODIC
 
 extern const size_t ux_imin;
 extern const size_t uy_jmin;

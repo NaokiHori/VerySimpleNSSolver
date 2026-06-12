@@ -2,14 +2,11 @@
 #include "logger.h"
 #include "boundary_condition.h"
 
+#if !defined(X_PERIODIC)
 int impose_boundary_condition_uy_x(
     const domain_t * const domain,
     double ** const uy
 ) {
-  if (X_PERIODIC) {
-    LOGGER_FAILURE("x direction is periodic");
-    goto abort;
-  }
   const size_t nx = domain->nx;
   const size_t ny = domain->ny;
   const double uy_xm = 0.;
@@ -19,18 +16,14 @@ int impose_boundary_condition_uy_x(
     uy[j][nx + 1] = 2. * uy_xp - uy[j][nx];
   }
   return 0;
-abort:
-  return 1;
 }
+#endif
 
+#if !defined(Y_PERIODIC)
 int impose_boundary_condition_uy_y(
     const domain_t * const domain,
     double ** const uy
 ) {
-  if (Y_PERIODIC) {
-    LOGGER_FAILURE("y direction is periodic");
-    goto abort;
-  }
   const size_t nx = domain->nx;
   const size_t ny = domain->ny;
   for (size_t i = 0; i <= nx + 1; i++) {
@@ -38,7 +31,6 @@ int impose_boundary_condition_uy_y(
     uy[ny + 1][i] = -1.;
   }
   return 0;
-abort:
-  return 1;
 }
+#endif
 

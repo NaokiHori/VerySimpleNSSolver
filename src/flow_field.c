@@ -17,28 +17,28 @@ static int init_ux(
       ux[j][i] = 0.;
     }
   }
-  if (X_PERIODIC) {
-    if (0 != exchange_halo_x(domain, ux)) {
-      LOGGER_FAILURE("failed to exchange halo in x (ux)");
-      goto abort;
-    }
-  } else {
-    if (0 != impose_boundary_condition_ux_x(domain, ux)) {
-      LOGGER_FAILURE("failed to impose boundary condition in x (ux)");
-      goto abort;
-    }
+#if defined(X_PERIODIC)
+  if (0 != exchange_halo_x(domain, ux)) {
+    LOGGER_FAILURE("failed to exchange halo in x (ux)");
+    goto abort;
   }
-  if (Y_PERIODIC) {
-    if (0 != exchange_halo_y(domain, ux)) {
-      LOGGER_FAILURE("failed to exchange halo in y (ux)");
-      goto abort;
-    }
-  } else {
-    if (0 != impose_boundary_condition_ux_y(domain, ux)) {
-      LOGGER_FAILURE("failed to impose boundary condition in y (ux)");
-      goto abort;
-    }
+#else
+  if (0 != impose_boundary_condition_ux_x(domain, ux)) {
+    LOGGER_FAILURE("failed to impose boundary condition in x (ux)");
+    goto abort;
   }
+#endif
+#if defined(Y_PERIODIC)
+  if (0 != exchange_halo_y(domain, ux)) {
+    LOGGER_FAILURE("failed to exchange halo in y (ux)");
+    goto abort;
+  }
+#else
+  if (0 != impose_boundary_condition_ux_y(domain, ux)) {
+    LOGGER_FAILURE("failed to impose boundary condition in y (ux)");
+    goto abort;
+  }
+#endif
   return 0;
 abort:
   return 1;
@@ -55,28 +55,28 @@ static int init_uy(
       uy[j][i] = -1.;
     }
   }
-  if (X_PERIODIC) {
-    if (0 != exchange_halo_x(domain, uy)) {
-      LOGGER_FAILURE("failed to exchange halo in x (uy)");
-      goto abort;
-    }
-  } else {
-    if (0 != impose_boundary_condition_uy_x(domain, uy)) {
-      LOGGER_FAILURE("failed to impose boundary condition in x (uy)");
-      goto abort;
-    }
+#if defined(X_PERIODIC)
+  if (0 != exchange_halo_x(domain, uy)) {
+    LOGGER_FAILURE("failed to exchange halo in x (uy)");
+    goto abort;
   }
-  if (Y_PERIODIC) {
-    if (0 != exchange_halo_y(domain, uy)) {
-      LOGGER_FAILURE("failed to exchange halo in y (uy)");
-      goto abort;
-    }
-  } else {
-    if (0 != impose_boundary_condition_uy_y(domain, uy)) {
-      LOGGER_FAILURE("failed to impose boundary condition in y (uy)");
-      goto abort;
-    }
+#else
+  if (0 != impose_boundary_condition_uy_x(domain, uy)) {
+    LOGGER_FAILURE("failed to impose boundary condition in x (uy)");
+    goto abort;
   }
+#endif
+#if defined(Y_PERIODIC)
+  if (0 != exchange_halo_y(domain, uy)) {
+    LOGGER_FAILURE("failed to exchange halo in y (uy)");
+    goto abort;
+  }
+#else
+  if (0 != impose_boundary_condition_uy_y(domain, uy)) {
+    LOGGER_FAILURE("failed to impose boundary condition in y (uy)");
+    goto abort;
+  }
+#endif
   return 0;
 abort:
   return 1;
@@ -93,21 +93,23 @@ static int init_p(
       p[j][i] = 0.;
     }
   }
-  if (X_PERIODIC) {
-    if (0 != exchange_halo_x(domain, p)) {
-      LOGGER_FAILURE("failed to exchange halo in x (p)");
-      goto abort;
-    }
+#if defined(X_PERIODIC)
+  if (0 != exchange_halo_x(domain, p)) {
+    LOGGER_FAILURE("failed to exchange halo in x (p)");
+    goto abort;
   }
-  if (Y_PERIODIC) {
-    if (0 != exchange_halo_y(domain, p)) {
-      LOGGER_FAILURE("failed to exchange halo in y (p)");
-      goto abort;
-    }
+#endif
+#if defined(Y_PERIODIC)
+  if (0 != exchange_halo_y(domain, p)) {
+    LOGGER_FAILURE("failed to exchange halo in y (p)");
+    goto abort;
   }
+#endif
   return 0;
+#if defined(X_PERIODIC) || defined(Y_PERIODIC)
 abort:
   return 1;
+#endif
 }
 
 static int init_weight(
